@@ -1,0 +1,71 @@
+# Eclipse
+bin/
+*.launch
+.settings/
+.metadata/
+.classpath
+.project
+
+# IntelliJ IDEA
+out/
+*.ipr
+*.iws
+*.iml
+.idea/
+
+# Gradle
+build/
+.gradle/
+gradle-app.setting
+
+# NeoForge/Minecraft
+run/
+runs/
+run-data/
+logs/
+
+# Other
+eclipse/
+repo/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Exception: Allow FMOD DLL files in resources
+!src/main/resources/libraries/*.dll
+
+# Local development files
+local.properties
+.env
+.env.local
+
+# VS Code
+.vscode/
+
+# Claude temporary files
+.claude/

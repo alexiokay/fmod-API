@@ -1,0 +1,13 @@
+{
+  "itemGroup.fmodapi": "Example Mod Tab",
+  "block.fmodapi.example_block": "Example Block",
+  "item.fmodapi.example_item": "Example Item",
+
+  "fmodapi.configuration.title": "fmod-API Configs",
+  "fmodapi.configuration.section.fmodapi.common.toml": "fmod-API Configs",
+  "fmodapi.configuration.section.fmodapi.common.toml.title": "fmod-API Configs",
+  "fmodapi.configuration.items": "Item List",
+  "fmodapi.configuration.logDirtBlock": "Log Dirt Block",
+  "fmodapi.configuration.magicNumberIntroduction": "Magic Number Text",
+  "fmodapi.configuration.magicNumber": "Magic Number"
+}

@@ -1,0 +1,54 @@
+FMOD API MOD LICENSE
+
+Copyright (c) 2024 alexiokay
+
+PROPRIETARY SOFTWARE - OFFICIAL DISTRIBUTION ONLY
+
+This software is proprietary and may only be distributed through official channels
+by the copyright holder (alexiokay).
+
+===== FMOD AUDIO ENGINE ATTRIBUTION =====
+
+This software uses FMOD Studio by Firelight Technologies Pty Ltd.
+FMOD Studio, copyright © Firelight Technologies Pty Ltd, 1994-2024.
+
+FMOD LICENSE NOTICE:
+This product includes FMOD Studio software. Usage of FMOD Studio is subject to the
+FMOD End User License Agreement (https://www.fmod.com/legal). This software requires
+a valid FMOD license for redistribution. Contact sales@fmod.com for redistribution
+licensing information.
+
+===== DISTRIBUTION RESTRICTIONS =====
+
+RESTRICTIONS:
+- No redistribution by third parties is permitted
+- No modification for redistribution is allowed
+- No commercial use without explicit written permission from alexiokay
+- Official distribution channels only
+- FMOD redistribution license required (contact sales@fmod.com)
+
+PERMITTED USES:
+- Personal use and development (non-commercial)
+- Use as a dependency for other mods (when obtained through official channels)
+- Code inspection for educational purposes
+- Non-commercial Minecraft modding projects
+
+ATTRIBUTION REQUIREMENTS:
+When using this mod, you must display the following attribution:
+"Audio powered by FMOD Studio by Firelight Technologies Pty Ltd"
+
+IMPORTANT LICENSING NOTES:
+1. This mod redistributes FMOD Studio libraries and requires proper FMOD licensing
+2. Commercial use requires both alexiokay permission AND valid FMOD commercial license
+3. Any revenue-generating project using this mod must obtain proper FMOD licensing
+4. Contact sales@fmod.com for FMOD redistribution/commercial licensing
+
+For official downloads and updates, visit the official distribution channels.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
