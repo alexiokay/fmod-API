@@ -47,8 +47,19 @@ public class FMODConfig {
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
-        // When config loads, check if FMOD should be initialized
-        FMODSystem.checkConfigAndInit();
+        try {
+            // When config loads, check if FMOD should be initialized
+            FMODSystem.checkConfigAndInit();
+        } catch (Throwable e) {
+            // Prevent FMOD initialization failures from crashing Minecraft
+            System.err.println("[FMOD API] Failed to initialize FMOD during config load - FMOD will be disabled");
+            System.err.println("[FMOD API] This is not critical - audio will fall back to OpenAL");
+            System.err.println("[FMOD API] Error: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            e.printStackTrace();
+
+            // Ensure FMOD system is marked as failed so it gracefully falls back
+            FMODSystem.markInitializationFailed();
+        }
     }
 
     @SubscribeEvent
@@ -71,18 +82,14 @@ public class FMODConfig {
 
             System.out.println("[FMOD API Config] Runtime config check: fmodEnabled=" + fmodEnabled + ", fmodCurrentlyRunning=" + fmodCurrentlyRunning);
 
-            if (fmodEnabled && !fmodCurrentlyRunning) {
-                // User enabled FMOD but it's not running - initialize it
-                System.out.println("[FMOD API Config] FMOD enabled in config - initializing...");
+            // Use checkConfigAndInit() which handles routing properly without reinitializing
+            // FMOD system stays initialized once loaded, only routing changes based on config
+            System.out.println("[FMOD API Config] Updating FMOD routing based on config...");
+            try {
                 FMODSystem.checkConfigAndInit();
-                // Cache invalidation happens automatically in notifyStatusChange()
-            } else if (!fmodEnabled && fmodCurrentlyRunning) {
-                // User disabled FMOD but it's running - shut it down
-                System.out.println("[FMOD API Config] FMOD disabled in config - shutting down...");
-                FMODSystem.shutdown();
-                // Cache invalidation happens automatically in notifyStatusChange()
-            } else {
-                System.out.println("[FMOD API Config] No FMOD state change needed");
+            } catch (Throwable e) {
+                System.err.println("[FMOD API Config] Failed to update FMOD routing: " + e.getMessage());
+                e.printStackTrace();
             }
 
             // Status change notifications are handled automatically by FMODSystem

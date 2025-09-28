@@ -1,0 +1,607 @@
+---
+title: 'API Reference'
+description: 'Complete API documentation for FMOD API methods and integration features'
+navigation:
+  title: 'API Reference'
+  icon: 'book'
+---
+
+# FMOD API Reference
+
+Complete API documentation for FMOD API methods and integration features.
+
+## 🎯 Overview
+
+The FMOD API provides a comprehensive interface for playing 3D spatial audio in Minecraft mods, with full integration into Minecraft's native audio system.
+
+### API Structure
+
+```
+FMODAPI.java               // 🎵 Main public interface
+├── Core Playback          // playEvent, playEventAt, playEventSimple
+├── Audio Control          // pauseAllSounds, resumeAllSounds, setMasterVolume
+├── Bank Management        // registerBank, loadBankFromResource
+├── Status & Utility       // isAvailable, getActiveInstances, setListenerPosition
+└── Integration Support    // Minecraft native integration hooks
+```
+
+## 🎵 Core Audio Methods
+
+### playEvent()
+
+**Primary method for playing FMOD events with full control**
+
+```java
+public static String playEvent(String eventName, Vec3D position, float volume, float pitch)
+```
+
+#### Parameters
+
+| Parameter | Type | Description | Range |
+|-----------|------|-------------|-------|
+| `eventName` | String | FMOD event path (e.g., "event:/vehicles/engine") | Valid FMOD event |
+| `position` | Vec3D | 3D world position (null for 2D) | Any coordinates |
+| `volume` | float | Volume multiplier | 0.0 - ∞ (typically 0.0-2.0) |
+| `pitch` | float | Pitch multiplier | 0.1 - 10.0 (1.0 = normal) |
+
+#### Returns
+- **Type:** `String`
+- **Value:** Unique instance ID for further control, or `null` if failed/disabled
+
+#### Example
+
+```java
+// Play engine sound at vehicle position
+String instanceId = FMODAPI.playEvent(
+    "event:/vehicles/engine/idle",
+    new Vec3D(x, y, z),
+    1.0f,    // Normal volume
+    1.2f     // Slightly higher pitch
+);
+
+if (instanceId != null) {
+    // Sound playing via FMOD
+    System.out.println("FMOD instance: " + instanceId);
+} else {
+    // Fallback to OpenAL
+    playOpenALSound();
+}
+```
+
+### playEventAt()
+
+**Simplified 3D positioned audio**
+
+```java
+public static String playEventAt(String eventName, double x, double y, double z, float volume, float pitch)
+```
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `eventName` | String | FMOD event path |
+| `x, y, z` | double | World coordinates |
+| `volume` | float | Volume multiplier |
+| `pitch` | float | Pitch multiplier |
+
+#### Example
+
+```java
+// Quick positioned sound
+String id = FMODAPI.playEventAt("event:/weapons/gunshot", x, y, z, 1.0f, 1.0f);
+```
+
+### playEventSimple()
+
+**Simplified method for basic 3D audio**
+
+```java
+public static boolean playEventSimple(String eventName, double x, double y, double z)
+```
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `eventName` | String | FMOD event path |
+| `x, y, z` | double | World coordinates |
+
+#### Returns
+- **Type:** `boolean`
+- **Value:** `true` if sound played successfully
+
+#### Example
+
+```java
+// Simple one-shot sound
+boolean success = FMODAPI.playEventSimple("event:/effects/explosion", x, y, z);
+
+if (success) {
+    System.out.println("Explosion sound played via FMOD");
+} else {
+    System.out.println("Explosion sound played via OpenAL fallback");
+}
+```
+
+## 🎮 Minecraft Integration Methods
+
+### pauseAllSounds()
+
+**Instantly pause all active FMOD instances**
+
+```java
+public static void pauseAllSounds()
+```
+
+- **Purpose:** Used by Minecraft integration for ESC menu pause
+- **Effect:** All active FMOD instances are paused
+- **Performance:** <1ms execution time
+- **Usage:** Typically called automatically by integration
+
+#### Example
+
+```java
+// Manual pause (usually handled automatically)
+FMODAPI.pauseAllSounds();
+System.out.println("All FMOD sounds paused");
+```
+
+### resumeAllSounds()
+
+**Resume all paused FMOD instances**
+
+```java
+public static void resumeAllSounds()
+```
+
+- **Purpose:** Used by Minecraft integration when returning to game
+- **Effect:** All paused FMOD instances are resumed
+- **Performance:** <1ms execution time
+- **Usage:** Typically called automatically by integration
+
+#### Example
+
+```java
+// Manual resume (usually handled automatically)
+FMODAPI.resumeAllSounds();
+System.out.println("All FMOD sounds resumed");
+```
+
+### setMasterVolume()
+
+**Control global FMOD volume**
+
+```java
+public static void setMasterVolume(float volume)
+```
+
+#### Parameters
+
+| Parameter | Type | Description | Range |
+|-----------|------|-------------|-------|
+| `volume` | float | Master volume level | 0.0 (mute) - 1.0 (full) |
+
+- **Purpose:** Used by Minecraft integration for volume sync
+- **Effect:** Affects all FMOD audio globally
+- **Integration:** Automatically synced with Minecraft volume sliders
+
+#### Example
+
+```java
+// Set 50% volume (usually handled automatically)
+FMODAPI.setMasterVolume(0.5f);
+```
+
+## 📦 Bank Management
+
+### registerBank()
+
+**Register a bank for automatic loading**
+
+```java
+public static void registerBank(Class<?> modClass, String resourcePath)
+```
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `modClass` | Class<?> | Mod class for resource loading |
+| `resourcePath` | String | Path to bank file in resources |
+
+#### Example
+
+```java
+// Register during mod initialization
+@SubscribeEvent
+public void onClientSetup(FMLClientSetupEvent event) {
+    FMODAPI.registerBank(MyMod.class, "/assets/mymod/sounds/fmod/master.bank");
+    FMODAPI.registerBank(MyMod.class, "/assets/mymod/sounds/fmod/master.strings.bank");
+}
+```
+
+### loadBankFromResource()
+
+**Load a bank from mod resources**
+
+```java
+public static boolean loadBankFromResource(Class<?> modClass, String resourcePath)
+```
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `modClass` | Class<?> | Mod class for resource loading |
+| `resourcePath` | String | Path to bank file in resources |
+
+#### Returns
+- **Type:** `boolean`
+- **Value:** `true` if loaded successfully
+
+#### Example
+
+```java
+// Load bank immediately
+boolean success = FMODAPI.loadBankFromResource(
+    MyMod.class,
+    "/assets/mymod/sounds/weapons.bank"
+);
+
+if (success) {
+    System.out.println("Weapons bank loaded successfully");
+} else {
+    System.out.println("Failed to load weapons bank");
+}
+```
+
+## ⚙️ Configuration API
+
+### isAvailable()
+
+**Check if FMOD system is ready**
+
+```java
+public static boolean isAvailable()
+```
+
+#### Returns
+- **Type:** `boolean`
+- **Value:** `true` if FMOD is initialized and enabled
+
+#### Example
+
+```java
+// Always check before using FMOD
+if (FMODAPI.isAvailable()) {
+    FMODAPI.playEvent("event:/test", null, 1.0f, 1.0f);
+} else {
+    // Use OpenAL fallback
+    playOpenALSound();
+}
+```
+
+### getActiveInstances()
+
+**Get map of currently playing instances**
+
+```java
+public static Map<String, Long> getActiveInstances()
+```
+
+#### Returns
+- **Type:** `Map<String, Long>`
+- **Value:** Instance ID to FMOD handle mapping
+
+#### Example
+
+```java
+Map<String, Long> instances = FMODAPI.getActiveInstances();
+System.out.println("Active FMOD instances: " + instances.size());
+
+for (String instanceId : instances.keySet()) {
+    System.out.println("Instance: " + instanceId);
+}
+```
+
+### getActiveInstanceCount()
+
+**Get number of currently playing sounds**
+
+```java
+public static int getActiveInstanceCount()
+```
+
+#### Returns
+- **Type:** `int`
+- **Value:** Number of active FMOD instances
+
+#### Example
+
+```java
+int activeCount = FMODAPI.getActiveInstanceCount();
+int maxCount = FMODAPI.getMaxInstanceCount();
+
+System.out.println("FMOD Usage: " + activeCount + "/" + maxCount);
+
+// Calculate usage percentage
+float usage = (float) activeCount / maxCount * 100f;
+System.out.println("Usage: " + String.format("%.1f%%", usage));
+```
+
+### getMaxInstanceCount()
+
+**Get maximum configured instances**
+
+```java
+public static int getMaxInstanceCount()
+```
+
+#### Returns
+- **Type:** `int`
+- **Value:** Maximum instances from config
+
+## 🔊 Audio Control
+
+### setListenerPosition()
+
+**Update 3D audio listener position**
+
+```java
+public static void setListenerPosition(double x, double y, double z,
+                                     double forwardX, double forwardY, double forwardZ,
+                                     double velX, double velY, double velZ)
+```
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `x, y, z` | double | Listener position |
+| `forwardX, forwardY, forwardZ` | double | Forward direction vector |
+| `velX, velY, velZ` | double | Velocity vector |
+
+**Note:** Automatically handled by `FMODListenerTracker` for player position
+
+#### Example
+
+```java
+// Manual listener positioning (usually automatic)
+Player player = Minecraft.getInstance().player;
+if (player != null) {
+    Vec3 lookVector = player.getLookAngle();
+    Vec3 velocity = player.getDeltaMovement();
+
+    FMODAPI.setListenerPosition(
+        player.getX(), player.getY(), player.getZ(),
+        lookVector.x, lookVector.y, lookVector.z,
+        velocity.x, velocity.y, velocity.z
+    );
+}
+```
+
+### stopAllSounds()
+
+**Stop all currently playing FMOD sounds**
+
+```java
+public static void stopAllSounds()
+```
+
+::alert{type="warning"}
+**Warning:** This is for internal use (cleanup). Use `pauseAllSounds()` for pause functionality.
+::
+
+#### Example
+
+```java
+// Emergency stop (for cleanup/shutdown)
+FMODAPI.stopAllSounds();
+System.out.println("All FMOD sounds stopped");
+```
+
+## 🎯 Usage Patterns
+
+### Basic Sound Playback
+
+```java
+public class SoundEffects {
+
+    public static void playUIClick(double x, double y, double z) {
+        // Simple positioned sound
+        FMODAPI.playEventSimple("event:/ui/button_click", x, y, z);
+    }
+
+    public static void playExplosion(Vec3D position, float intensity) {
+        // Advanced sound with intensity
+        if (FMODAPI.isAvailable()) {
+            FMODAPI.playEvent("event:/effects/explosion",
+                            position, intensity, 1.0f);
+        } else {
+            // OpenAL fallback
+            playOGGExplosion(position, intensity);
+        }
+    }
+}
+```
+
+### Vehicle Engine System
+
+```java
+public class VehicleAudio {
+    private String engineSoundId = null;
+
+    public void startEngine(Vec3D position) {
+        if (FMODAPI.isAvailable() && engineSoundId == null) {
+            engineSoundId = FMODAPI.playEvent("event:/vehicles/engine/start",
+                                            position, 1.0f, 1.0f);
+        }
+    }
+
+    public void updateEngine(Vec3D position, float rpm) {
+        if (engineSoundId != null) {
+            // Update position and parameters
+            // Note: Parameter updates require additional FMOD Studio API calls
+        }
+    }
+
+    public void stopEngine() {
+        if (engineSoundId != null) {
+            FMODAPI.stopEvent(engineSoundId, true); // Allow fade-out
+            engineSoundId = null;
+        }
+    }
+}
+```
+
+### Bank Management System
+
+```java
+@Mod("mymod")
+public class MyMod {
+
+    @SubscribeEvent
+    public void onClientSetup(FMLClientSetupEvent event) {
+        // Load sound banks in order
+        loadAudioBanks();
+    }
+
+    private void loadAudioBanks() {
+        if (!FMODAPI.isAvailable()) {
+            System.out.println("FMOD not available, using OpenAL");
+            return;
+        }
+
+        // Load string bank first
+        boolean stringsLoaded = FMODAPI.loadBankFromResource(
+            MyMod.class, "/assets/mymod/sounds/fmod/master.strings.bank");
+
+        // Load main bank
+        boolean masterLoaded = FMODAPI.loadBankFromResource(
+            MyMod.class, "/assets/mymod/sounds/fmod/master.bank");
+
+        // Load additional banks
+        boolean vehiclesLoaded = FMODAPI.loadBankFromResource(
+            MyMod.class, "/assets/mymod/sounds/fmod/vehicles.bank");
+
+        System.out.println("Banks loaded - Strings: " + stringsLoaded +
+                          ", Master: " + masterLoaded +
+                          ", Vehicles: " + vehiclesLoaded);
+    }
+}
+```
+
+### Error Handling Pattern
+
+```java
+public class SafeAudioManager {
+
+    public static boolean playSound(String eventName, Vec3D position) {
+        return playSound(eventName, position, 1.0f, 1.0f);
+    }
+
+    public static boolean playSound(String eventName, Vec3D position,
+                                  float volume, float pitch) {
+        try {
+            if (FMODAPI.isAvailable()) {
+                String result = FMODAPI.playEvent(eventName, position, volume, pitch);
+                return result != null;
+            } else {
+                // Fallback to OpenAL
+                return playOpenALSound(eventName, position, volume, pitch);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to play sound: " + eventName);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static boolean playOpenALSound(String eventName, Vec3D position,
+                                         float volume, float pitch) {
+        // Your OpenAL implementation
+        return false;
+    }
+}
+```
+
+## 📊 Method Summary
+
+### Playback Methods
+
+| Method | Purpose | Returns | Usage |
+|--------|---------|---------|-------|
+| `playEvent()` | Full-featured audio playback | Instance ID or null | Advanced control |
+| `playEventAt()` | Simple positioned audio | Instance ID or null | Quick positioning |
+| `playEventSimple()` | Basic 3D audio | boolean success | Fire-and-forget |
+
+### Integration Methods
+
+| Method | Purpose | Auto-Called | When to Use |
+|--------|---------|-------------|-------------|
+| `pauseAllSounds()` | Pause all instances | ✅ On ESC menu | Manual override |
+| `resumeAllSounds()` | Resume all instances | ✅ On menu close | Manual override |
+| `setMasterVolume()` | Control global volume | ✅ On volume change | Manual override |
+
+### Management Methods
+
+| Method | Purpose | When to Use | Returns |
+|--------|---------|-------------|---------|
+| `registerBank()` | Register for auto-loading | Mod initialization | void |
+| `loadBankFromResource()` | Manual bank loading | Runtime loading | boolean |
+| `isAvailable()` | Check FMOD status | Before playback | boolean |
+
+### Control Methods
+
+| Method | Purpose | Auto-Handled | Use Case |
+|--------|---------|-------------|----------|
+| `setListenerPosition()` | Update 3D listener | ✅ Player tracking | Manual override |
+| `stopAllSounds()` | Stop all sounds | Cleanup only | Emergency stop |
+| `getActiveInstanceCount()` | Monitor usage | Performance monitoring | Debugging |
+
+## 🔧 Advanced Usage
+
+### Configuration Access
+
+```java
+// Access FMOD configuration
+boolean enabled = FMODConfig.FMOD_ENABLED.get();
+boolean debug = FMODConfig.DEBUG_LOGGING.get();
+int maxInstances = FMODConfig.MAX_INSTANCES.get();
+String customPath = FMODConfig.FMOD_CUSTOM_PATH.get();
+
+// React to config changes
+@SubscribeEvent
+public static void onConfigChange(ModConfigEvent.Reloading event) {
+    if (event.getConfig().getModId().equals("fmodapi")) {
+        handleConfigUpdate();
+    }
+}
+```
+
+### Performance Monitoring
+
+```java
+// Monitor FMOD system health
+public static void logSystemStatus() {
+    boolean available = FMODAPI.isAvailable();
+    int active = FMODAPI.getActiveInstanceCount();
+    int max = FMODAPI.getMaxInstanceCount();
+
+    System.out.println("FMOD Status: " + (available ? "Available" : "Unavailable"));
+    System.out.println("Instances: " + active + "/" + max +
+                      " (" + String.format("%.1f%%", (float)active/max*100) + ")");
+}
+```
+
+## 📚 Related Documentation
+
+- 🚀 [**Getting Started**](/docs/getting-started) - Basic setup and installation
+- 🎮 [**Native Integration**](/docs/integration) - Automatic Minecraft integration
+- ⚙️ [**Configuration**](/docs/configuration) - Settings and options
+- 🏗️ [**Advanced Guide**](/docs/advanced) - Technical deep dive
+
+::alert{type="success"}
+**API is designed for simplicity** - Most use cases only need `playEventSimple()` and `isAvailable()`. Advanced features are available when needed.
+::

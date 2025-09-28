@@ -148,7 +148,18 @@ public class FMODSystem {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Create FMOD Studio system
             PointerBuffer systemPtr = stack.mallocPointer(1);
-            int result = FMODStudio.FMOD_Studio_System_Create(systemPtr, FMOD.FMOD_VERSION);
+            int result;
+            try {
+                // This line can trigger ExceptionInInitializerError if LWJGL can't load FMOD DLLs
+                result = FMODStudio.FMOD_Studio_System_Create(systemPtr, FMOD.FMOD_VERSION);
+            } catch (Throwable e) {
+                logError(RED + "Failed to access FMOD Studio API (native libraries not available): " + e.getClass().getSimpleName() + ": " + e.getMessage() + RESET);
+                currentStatus = "Native library access failed";
+                currentAudioSystem = "None";
+                currentErrorCode = -2;
+                initializationFailed = true;
+                return;
+            }
 
             if (result != FMOD.FMOD_OK) {
                 logError(RED + "FMOD system creation failed: error code=" + result + RESET);
@@ -331,14 +342,59 @@ public class FMODSystem {
      * Try loading from common installation paths
      */
     private static boolean tryLoadFromCommonPaths() {
-        String[] commonPaths = {
-            "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows\\api\\core\\lib\\x64\\",
-            "C:\\Program Files\\FMOD SoundSystem\\FMOD Studio API Windows\\api\\core\\lib\\x64\\",
-            "C:\\Program Files (x86)\\FMOD\\api\\core\\lib\\x64\\",
-            "C:\\Program Files\\FMOD\\api\\core\\lib\\x64\\",
-            ".\\fmod\\",
-            ".\\libraries\\"
-        };
+        // Cross-platform FMOD installation paths
+        java.util.List<String> pathList = new java.util.ArrayList<>();
+        String os = System.getProperty("os.name").toLowerCase();
+        String userHome = System.getProperty("user.home");
+
+        if (os.contains("win")) {
+            // Windows paths
+            pathList.addAll(java.util.Arrays.asList(
+                "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows\\",
+                "C:\\Program Files\\FMOD SoundSystem\\FMOD Studio API Windows\\",
+                "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Engine\\",
+                "C:\\Program Files\\FMOD SoundSystem\\FMOD Engine\\",
+                "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows 2.02\\",
+                "C:\\Program Files\\FMOD SoundSystem\\FMOD Studio API Windows 2.02\\",
+                "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows 2.03\\",
+                "C:\\Program Files\\FMOD SoundSystem\\FMOD Studio API Windows 2.03\\",
+                "C:\\Program Files (x86)\\FMOD\\",
+                "C:\\Program Files\\FMOD\\"
+            ));
+        } else if (os.contains("mac")) {
+            // macOS paths
+            pathList.addAll(java.util.Arrays.asList(
+                "/Applications/FMOD SoundSystem/FMOD Studio API Mac/",
+                "/Applications/FMOD SoundSystem/FMOD Engine/",
+                "/Applications/FMOD SoundSystem/",
+                "/usr/local/fmod/",
+                "/opt/fmod/",
+                userHome + "/Library/Application Support/FMOD Studio/",  // ≤ v2.02
+                userHome + "/Library/Preferences/FMOD Studio/",          // ≥ v2.03
+                userHome + "/Applications/FMOD SoundSystem/",
+                userHome + "/FMOD/"
+            ));
+        } else if (os.contains("linux") || os.contains("unix")) {
+            // Linux/Unix paths
+            pathList.addAll(java.util.Arrays.asList(
+                "/usr/local/lib/fmod/",
+                "/usr/lib/fmod/",
+                "/usr/share/fmod/",
+                "/opt/fmod/",
+                userHome + "/FMOD Studio/",
+                userHome + "/.local/share/fmod/",
+                userHome + "/fmod/"
+            ));
+        }
+
+        // Add universal local paths (works on all platforms)
+        String localSeparator = System.getProperty("file.separator");
+        pathList.addAll(java.util.Arrays.asList(
+            "." + localSeparator + "fmod" + localSeparator,
+            "." + localSeparator + "libraries" + localSeparator
+        ));
+
+        String[] commonPaths = pathList.toArray(new String[0]);
 
         for (String path : commonPaths) {
             try {
@@ -369,22 +425,54 @@ public class FMODSystem {
             return;
         }
 
-        throw new Exception("FMOD DLLs not found in " + basePath + " or its subfolders (searched 4 levels deep)");
+        throw new Exception("FMOD libraries not found in " + basePath + " or its subfolders (searched 4 levels deep)");
     }
 
     /**
-     * Try loading from direct path (exact folder)
+     * Try loading from direct path (exact folder or FMOD installation base)
      */
     private static boolean tryLoadDirectPath(String basePath) {
         try {
-            String fmodPath = basePath + "fmod.dll";
-            String fmodStudioPath = basePath + "fmodstudio.dll";
+            String os = System.getProperty("os.name").toLowerCase();
+            String sep = System.getProperty("file.separator");
+
+            // Determine library file extensions and architecture based on OS
+            String libExt, libPrefix, arch;
+            if (os.contains("win")) {
+                libExt = ".dll";
+                libPrefix = "";
+                arch = "x64";
+            } else if (os.contains("mac")) {
+                libExt = ".dylib";
+                libPrefix = "lib";
+                arch = "x86_64";
+            } else {
+                libExt = ".so";
+                libPrefix = "lib";
+                arch = "x86_64";
+            }
+
+            // First try: assume basePath contains both libraries directly (legacy/custom installs)
+            String fmodPath = basePath + libPrefix + "fmod" + libExt;
+            String fmodStudioPath = basePath + libPrefix + "fmodstudio" + libExt;
 
             java.io.File fmodFile = new java.io.File(fmodPath);
             java.io.File fmodStudioFile = new java.io.File(fmodStudioPath);
 
             if (fmodFile.exists() && fmodStudioFile.exists()) {
                 loadLibrariesFromFoundPaths(fmodPath, fmodStudioPath);
+                return true;
+            }
+
+            // Second try: official FMOD directory structure
+            String officialFmodPath = basePath + "api" + sep + "core" + sep + "lib" + sep + arch + sep + libPrefix + "fmod" + libExt;
+            String officialFmodStudioPath = basePath + "api" + sep + "studio" + sep + "lib" + sep + arch + sep + libPrefix + "fmodstudio" + libExt;
+
+            java.io.File officialFmodFile = new java.io.File(officialFmodPath);
+            java.io.File officialFmodStudioFile = new java.io.File(officialFmodStudioPath);
+
+            if (officialFmodFile.exists() && officialFmodStudioFile.exists()) {
+                loadLibrariesFromFoundPaths(officialFmodPath, officialFmodStudioPath);
                 return true;
             }
         } catch (Exception e) {
@@ -508,29 +596,41 @@ public class FMODSystem {
             boolean fmodEnabled = FMODConfig.FMOD_ENABLED.get();
 
             // Initialize FMOD once if not already initialized
-            if (!isInitialized) {
+            if (!isInitialized && !initializationFailed) {
                 log(GREEN + "Initializing FMOD system (one-time initialization)..." + RESET);
                 initializationFailed = false;
-                init();
+                try {
+                    init();
+                } catch (Throwable initException) {
+                    // Critical: FMOD initialization failed - mark as failed and continue with OpenAL
+                    logError(RED + "FMOD initialization failed during config load: " + initException.getClass().getSimpleName() + ": " + initException.getMessage() + RESET);
+                    markInitializationFailed();
+                    // Don't rethrow - let the method continue with OpenAL fallback
+                }
             }
 
             // Update routing behavior based on config
-            if (fmodEnabled) {
+            if (fmodEnabled && isInitialized) {
                 log(GREEN + "FMOD routing ENABLED - sounds will use FMOD system" + RESET);
                 currentAudioSystem = "FMOD";
 
                 // Load banks when enabling FMOD routing
-                if (isInitialized) {
-                    log(GREEN + "Loading banks after enabling FMOD routing..." + RESET);
-                    loadRegisteredBanks();
-                }
+                log(GREEN + "Loading banks after enabling FMOD routing..." + RESET);
+                loadRegisteredBanks();
             } else {
-                log(YELLOW + "FMOD routing DISABLED - sounds will use OpenAL fallback" + RESET);
+                if (fmodEnabled && !isInitialized) {
+                    log(YELLOW + "FMOD routing requested but FMOD failed to initialize - using OpenAL fallback" + RESET);
+                } else {
+                    log(YELLOW + "FMOD routing DISABLED - sounds will use OpenAL fallback" + RESET);
+                }
                 currentAudioSystem = "OpenAL";
-                currentStatus = "Routing disabled";
+                currentStatus = initializationFailed ? "Initialization failed" : "Routing disabled";
             }
-        } catch (Exception e) {
-            log(YELLOW + "Config still not available: " + e.getMessage() + RESET);
+        } catch (Exception configException) {
+            log(YELLOW + "Config not available during FMOD initialization: " + configException.getMessage() + RESET);
+            // Set safe defaults when config is not available
+            currentAudioSystem = "OpenAL";
+            currentStatus = "Config unavailable";
         }
     }
 
@@ -577,6 +677,7 @@ public class FMODSystem {
         while (iterator.hasNext()) {
             Map.Entry<String, Long> entry = iterator.next();
             long instance = entry.getValue();
+            boolean shouldCleanup = false;
 
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 var playbackState = stack.mallocInt(1);
@@ -584,18 +685,58 @@ public class FMODSystem {
 
                 if (result == FMOD.FMOD_OK) {
                     int state = playbackState.get(0);
+
+                    // Check for explicitly stopped instances
                     if (state == FMODStudio.FMOD_STUDIO_PLAYBACK_STOPPED ||
                         state == FMODStudio.FMOD_STUDIO_PLAYBACK_STOPPING) {
-                        FMODStudio.FMOD_Studio_EventInstance_Release(instance);
-                        iterator.remove();
-                        cleanedCount++;
+                        shouldCleanup = true;
+                    }
+                    // Check for one-shot events that have finished playing
+                    else if (state == FMODStudio.FMOD_STUDIO_PLAYBACK_PLAYING) {
+                        // Check if this is a one-shot event that has reached its end
+                        var timelinePosition = stack.mallocInt(1);
+                        int timeResult = FMODStudio.FMOD_Studio_EventInstance_GetTimelinePosition(instance, timelinePosition);
+
+                        if (timeResult == FMOD.FMOD_OK) {
+                            int position = timelinePosition.get(0);
+
+                            // Get event description to check if it's a one-shot
+                            PointerBuffer descPtr = stack.mallocPointer(1);
+                            int descResult = FMODStudio.FMOD_Studio_EventInstance_GetDescription(instance, descPtr);
+
+                            if (descResult == FMOD.FMOD_OK) {
+                                long description = descPtr.get(0);
+                                var isOneshot = stack.mallocInt(1);
+                                int oneshotResult = FMODStudio.FMOD_Studio_EventDescription_IsOneshot(description, isOneshot);
+
+                                if (oneshotResult == FMOD.FMOD_OK && isOneshot.get(0) == 1) {
+                                    // For one-shot events, check if timeline position has stopped advancing
+                                    // This indicates the event has finished playing
+                                    var length = stack.mallocInt(1);
+                                    int lengthResult = FMODStudio.FMOD_Studio_EventDescription_GetLength(description, length);
+
+                                    if (lengthResult == FMOD.FMOD_OK) {
+                                        int eventLength = length.get(0);
+                                        // If position is at or near the end, cleanup the instance
+                                        if (position >= eventLength - 50) { // 50ms tolerance
+                                            shouldCleanup = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
                     // Invalid instance, clean it up
+                    shouldCleanup = true;
+                }
+
+                if (shouldCleanup) {
                     FMODStudio.FMOD_Studio_EventInstance_Release(instance);
                     iterator.remove();
                     cleanedCount++;
                 }
+
             } catch (Exception e) {
                 // Error accessing instance, remove it
                 iterator.remove();
@@ -634,6 +775,22 @@ public class FMODSystem {
     public static int getMaxInstances() { return MAX_INSTANCES; }
 
     /**
+     * Mark FMOD initialization as failed - used for graceful fallback when startup fails
+     */
+    public static void markInitializationFailed() {
+        initializationFailed = true;
+        isInitialized = false;
+        currentStatus = "Initialization failed (graceful fallback)";
+        currentAudioSystem = "OpenAL";
+        currentErrorCode = -999; // Special code for startup failures
+        fmodSystem = 0;
+        log(YELLOW + "FMOD marked as failed - all operations will fall back to OpenAL" + RESET);
+
+        // Notify status change listeners
+        notifyStatusChange();
+    }
+
+    /**
      * Store bank data for automatic reloading
      * @param bankName Name of the bank file
      * @param bankData Bank file data
@@ -658,6 +815,19 @@ public class FMODSystem {
      */
     public static void removeStatusListener(StatusChangeListener listener) {
         statusListeners.remove(listener);
+    }
+
+    /**
+     * Notify all status change listeners
+     */
+    private static void notifyStatusChange() {
+        for (StatusChangeListener listener : statusListeners) {
+            try {
+                listener.onStatusChanged();
+            } catch (Exception e) {
+                logError("Error notifying status listener: " + e.getMessage());
+            }
+        }
     }
 
 
