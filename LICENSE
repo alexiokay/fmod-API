@@ -33,6 +33,21 @@ PERMITTED USES:
 - Code inspection for educational purposes
 - Non-commercial Minecraft modding projects
 
+DEVELOPMENT CONTRIBUTIONS:
+- Forking this repository for development purposes and pull requests is permitted
+- Contributors may modify code solely for the purpose of submitting improvements back to the original project
+- All contributions and pull requests become subject to this license upon submission
+- Contributors retain no independent distribution rights to their modifications
+- Forked repositories must not redistribute or make available FMOD libraries
+- Development forks must include this complete license and all attribution requirements
+- Only the original copyright holder (alexiokay) may merge contributions and distribute the modified software
+
+PROHIBITED USES:
+- Independent redistribution of forked or modified versions
+- Distribution of FMOD libraries through any channel other than official releases
+- Commercial use of forked versions without explicit written permission
+- Removal or modification of license terms, attribution, or copyright notices
+
 ATTRIBUTION REQUIREMENTS:
 When using this mod, you must display the following attribution:
 "Audio powered by FMOD Studio by Firelight Technologies Pty Ltd"

@@ -5,8 +5,9 @@
 
     <UHeader>
       <template #logo>
-        <NuxtLink to="/" class="flex items-center gap-2 text-xl font-bold">
-          🎵 FMOD API
+        <NuxtLink to="/" class="flex items-center gap-3 text-xl font-bold hover:scale-105 transition-transform duration-200">
+          <span class="text-2xl">🎵</span>
+          <span class="bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">FMOD API</span>
         </NuxtLink>
       </template>
 
@@ -16,8 +17,9 @@
           target="_blank"
           color="primary"
           variant="solid"
-          icon="download"
+          icon="i-heroicons-arrow-down-tray-20-solid"
           label="Download"
+          class="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
         />
       </template>
     </UHeader>
@@ -64,7 +66,7 @@
                   {
                     label: 'API Reference',
                     icon: 'code',
-                    to: '/api/reference'
+                    to: '/docs/api-reference'
                   },
                   {
                     label: 'External Links',
@@ -103,7 +105,7 @@
     <UFooter>
       <template #left>
         <p class="text-sm text-gray-500">
-          FMOD API for Minecraft &copy; 2024 alexiokay
+          FMOD API for Minecraft &copy; 2025 alexiokay
         </p>
       </template>
 

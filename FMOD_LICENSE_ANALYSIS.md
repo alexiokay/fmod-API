@@ -54,7 +54,7 @@ This document analyzes the FMOD licensing requirements for the FMOD API mod and 
 #### **Before (Non-Compliant)**
 ```
 FMOD API MOD LICENSE
-Copyright (c) 2024 alexiokay
+Copyright (c) 2025 alexiokay
 PROPRIETARY SOFTWARE - OFFICIAL DISTRIBUTION ONLY
 ```
 

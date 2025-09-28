@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <ContentDoc />
+  <div class="prose prose-lg max-w-none dark:prose-invert">
+    <ContentDoc class="min-h-screen" />
   </div>
 </template>
 
