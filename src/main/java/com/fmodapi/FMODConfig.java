@@ -17,6 +17,7 @@ public class FMODConfig {
     public static final ModConfigSpec.BooleanValue FMOD_ENABLED;
     public static final ModConfigSpec.BooleanValue DEBUG_LOGGING;
     public static final ModConfigSpec.IntValue MAX_INSTANCES;
+    public static final ModConfigSpec.ConfigValue<String> FMOD_CUSTOM_PATH;
 
     static {
         FMOD_ENABLED = BUILDER
@@ -31,6 +32,15 @@ public class FMODConfig {
             .comment("Maximum number of concurrent FMOD sound instances (32-4096, default: 512)")
             .translation("config.fmodapi.max_instances")
             .defineInRange("maxInstances", 512, 32, 4096);
+        FMOD_CUSTOM_PATH = BUILDER
+            .comment("Custom FMOD installation path (leave empty for auto-detection)",
+                     "If you installed FMOD Engine in a non-standard location, specify the path here.",
+                     "Example: C:\\MyCustomPath\\FMOD\\api\\core\\lib\\x64\\",
+                     "Required files: fmod.dll and fmodstudio.dll",
+                     "Compatible with FMOD Engine version 2.02.16 or higher",
+                     "Download from: https://www.fmod.com/download#fmodengine")
+            .translation("config.fmodapi.custom_path")
+            .define("fmodCustomPath", "");
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

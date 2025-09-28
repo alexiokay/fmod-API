@@ -59,6 +59,22 @@ If you encounter issues:
 3. **Architecture mismatch**: Ensure you're using the x64 (64-bit) versions of the DLLs
 4. **Permission errors**: Make sure the DLL files are not read-only
 
-## Alternative Audio Fallback
+## 🔄 Automatic Fallback System
 
-If FMOD libraries are not available or fail to load, the mod will automatically fall back to Minecraft's built-in OpenAL audio system. The mod will continue to function, but without FMOD's advanced 3D spatial audio features.
+**Note: FMOD DLL files are NOT currently shipped with the JAR due to licensing restrictions.**
+
+The FMOD API mod uses a three-tier loading system:
+
+1. **🎯 Primary**: Load from JAR resources (`/libraries/` folder) - **Currently empty, requires manual setup**
+2. **🔄 Secondary**: Load from system-installed FMOD (if you have FMOD Engine installed)
+3. **🛡️ Tertiary**: Fall back to OpenAL (always works)
+
+### How the Fallback Works
+- If you **don't place DLLs in the JAR** (current default), the mod will try to find FMOD on your system
+- If you **have FMOD Engine installed**, the mod may automatically detect and use it
+- If **neither works**, the mod gracefully falls back to OpenAL
+
+### For Best Results
+- **Recommended**: Place the DLL files in this directory for guaranteed compatibility
+- **Alternative**: Install FMOD Engine system-wide and let the mod auto-detect it
+- **Fallback**: OpenAL will always work as a backup

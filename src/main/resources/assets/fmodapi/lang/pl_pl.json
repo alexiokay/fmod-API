@@ -7,5 +7,6 @@
 
     "config.fmodapi.fmod_enabled": "Włącz Audio FMOD",
     "config.fmodapi.debug_logging": "Włącz Logowanie Debugowania",
-    "config.fmodapi.max_instances": "Maksymalna Liczba Instancji Dźwięku"
+    "config.fmodapi.max_instances": "Maksymalna Liczba Instancji Dźwięku",
+    "config.fmodapi.custom_path": "Niestandardowa Ścieżka FMOD"
 }

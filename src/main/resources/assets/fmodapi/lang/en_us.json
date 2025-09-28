@@ -5,5 +5,6 @@
 
   "config.fmodapi.fmod_enabled": "Enable FMOD Audio",
   "config.fmodapi.debug_logging": "Enable Debug Logging",
-  "config.fmodapi.max_instances": "Maximum Sound Instances"
+  "config.fmodapi.max_instances": "Maximum Sound Instances",
+  "config.fmodapi.custom_path": "Custom FMOD Path"
 }

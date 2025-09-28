@@ -116,6 +116,39 @@ FMODAPI.loadBank("/assets/mts/sounds/fmod/Master.bank"); // Wrong!
 
 ## 📦 Setup & Installation
 
+### ⚠️ Official Distribution Only
+
+**IMPORTANT: This mod must be downloaded from official sources only:**
+
+- **🟢 Modrinth**: [Official FMOD API page](https://modrinth.com/mod/fmod-api)
+- **🟢 CurseForge**: [Official FMOD API page](https://www.curseforge.com/minecraft/mc-mods/fmod-api)
+- **❌ Third-party redistribution is prohibited**
+
+### Using FMOD API as a Dependency
+
+**For Mod Developers:**
+
+1. **Download from official source** (Modrinth/CurseForge)
+2. **Add as dependency** in your `mods.toml`:
+```toml
+[[dependencies.yourmod]]
+    modId="fmodapi"
+    mandatory=true
+    versionRange="[1.0,)"
+    ordering="BEFORE"
+```
+3. **Use the API** in your mod code:
+```java
+if (FMODAPI.isAvailable()) {
+    FMODAPI.playEventSimple("event:/yourmod/sound", x, y, z);
+}
+```
+
+**For End Users:**
+- Install FMOD API from Modrinth/CurseForge
+- Install FMOD Engine separately (see below)
+- Other mods will automatically use FMOD API when available
+
 ### FMOD Libraries Setup
 
 **⚠️ IMPORTANT: FMOD DLL files are NOT included due to licensing restrictions.**
@@ -134,25 +167,71 @@ You must download and install the FMOD libraries yourself:
    - `api/core/lib/x64/fmod.dll`
    - `api/studio/lib/x64/fmodstudio.dll`
 
-#### Step 3: Place Libraries
-Copy both DLL files to: `src/main/resources/libraries/`
+#### Step 3: Automatic Detection
+The FMOD API mod will automatically detect and use FMOD Engine from your system installation.
 
-#### Expected Structure
-```
-src/main/resources/libraries/
-├── README.md
-├── fmod.dll
-└── fmodstudio.dll
-```
+**No manual file copying required** - the mod uses smart detection to find FMOD libraries.
+
+### 🔍 Smart Library Detection
+
+The mod uses a **3-tier detection system**:
+
+1. **🎯 JAR Resources** (if included): Loads DLLs from mod's `/libraries/` folder
+2. **🔄 System Detection**: Automatically finds FMOD from standard locations
+3. **🛡️ OpenAL Fallback**: Always works as backup
+
+### ⚙️ Custom Installation Paths
+
+**For non-standard FMOD installations:**
+
+1. **Open FMOD API config** in-game (Mods → FMOD API → Config)
+2. **Set "Custom FMOD Path"** to your installation directory
+3. **Examples:**
+   ```
+   C:\MyCustomPath\FMOD\
+   D:\PortableApps\FMOD\
+   E:\Games\Audio\FMOD Engine\
+   ```
+4. **The mod automatically scans** up to 4 levels deep to find:
+   - `fmod.dll`
+   - `fmodstudio.dll`
+
+### 📁 Detection Priority
+
+**The mod searches in this order:**
+
+1. **Custom path** (from config) - scans recursively
+2. **System PATH** - standard library loading
+3. **Common paths** - auto-detects standard installations:
+   - `C:\Program Files (x86)\FMOD SoundSystem\`
+   - `C:\Program Files\FMOD SoundSystem\`
+   - Local directories (`.\fmod\`, `.\libraries\`)
+
+### 🎯 User-Friendly Setup
+
+**Most users:** Just install FMOD Engine - auto-detection works!
+
+**Custom installs:** Set the root folder in config - recursive scanning finds the DLLs anywhere within 4 folder levels.
+
+**Example:** Set path to `C:\MyFMOD\` and it will find DLLs at:
+`C:\MyFMOD\Studio\API\Windows\api\core\lib\x64\fmod.dll`
 
 #### Licensing Note
-- FMOD requires separate licensing for redistribution
-- Free for non-commercial use and indie development
-- Commercial projects need commercial licenses
-- See https://www.fmod.com/legal for full terms
+- FMOD Engine is free for non-commercial use and indie development
+- Commercial projects need commercial licenses from FMOD
+- See https://www.fmod.com/legal for full licensing terms
+- **This mod does NOT redistribute FMOD libraries** - you install them separately
+- **Compatible with FMOD Engine 2.02.16 or higher**
 
 #### Fallback Behavior
-If FMOD libraries are missing, the mod automatically falls back to Minecraft's OpenAL audio system with reduced functionality.
+If FMOD Engine is not found anywhere, the mod automatically falls back to Minecraft's OpenAL audio system. Mods using FMOD API will still work, but with reduced audio functionality.
+
+#### Why This Approach?
+- **Legal compliance**: Avoids FMOD redistribution licensing issues
+- **User-friendly**: Works with any installation location
+- **Always up-to-date**: Uses your latest FMOD Engine installation
+- **Flexible**: Handles custom, portable, and standard installations
+- **Safe for modpacks**: No licensing concerns for modpack creators
 
 ## 🔧 Technical Requirements
 

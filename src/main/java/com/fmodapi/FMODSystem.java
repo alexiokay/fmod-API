@@ -69,20 +69,28 @@ public class FMODSystem {
     private static final String YELLOW = "\u001B[33m";
 
     /**
-     * Pre-initialization - load native libraries
+     * Pre-initialization - load native libraries with fallback support
      */
     public static void preInit() {
         try {
-            // Prevent LWJGL from auto-loading FMOD libraries from system PATH
-            System.setProperty("org.lwjgl.librarypath", "");
-            System.setProperty("java.library.path", "");
-
-            // Load FMOD native libraries from our JAR
+            // Try loading from JAR resources first
             loadNativeLibraries();
             log(GREEN + "FMOD native libraries loaded successfully from JAR resources" + RESET);
-        } catch (Exception e) {
-            logError(RED + "Failed to load FMOD native libraries: " + e.getMessage() + RESET);
-            initializationFailed = true;
+        } catch (Exception jarException) {
+            log(YELLOW + "JAR library loading failed: " + jarException.getMessage() + RESET);
+            log(YELLOW + "Attempting fallback to system-installed FMOD libraries..." + RESET);
+
+            try {
+                // Fallback to system-installed FMOD libraries
+                loadSystemLibraries();
+                log(GREEN + "FMOD native libraries loaded successfully from system PATH" + RESET);
+            } catch (Exception systemException) {
+                logError(RED + "Failed to load FMOD libraries from both JAR and system:" + RESET);
+                logError(RED + "  JAR error: " + jarException.getMessage() + RESET);
+                logError(RED + "  System error: " + systemException.getMessage() + RESET);
+                logError(RED + "FMOD will not be available - falling back to OpenAL" + RESET);
+                initializationFailed = true;
+            }
         }
     }
 
@@ -250,6 +258,193 @@ public class FMODSystem {
     private static void loadNativeLibraries() throws Exception {
         loadLibraryFromResource("/libraries/fmod.dll", "fmod");
         loadLibraryFromResource("/libraries/fmodstudio.dll", "fmodstudio");
+    }
+
+    /**
+     * Fallback method to load FMOD libraries from system installation
+     */
+    private static void loadSystemLibraries() throws Exception {
+        // Try loading in priority order:
+        // 1. Custom path from config (highest priority)
+        // 2. System PATH
+        // 3. Common installation paths
+
+        // 1. Try custom path first
+        if (tryLoadFromCustomPath()) {
+            return;
+        }
+
+        // 2. Try system PATH
+        if (tryLoadFromSystemPath()) {
+            return;
+        }
+
+        // 3. Try common installation paths
+        if (tryLoadFromCommonPaths()) {
+            return;
+        }
+
+        throw new Exception("Failed to load FMOD libraries from custom path, system PATH, and common installation locations");
+    }
+
+    /**
+     * Try loading from user-configured custom path
+     */
+    private static boolean tryLoadFromCustomPath() {
+        try {
+            String customPath = FMODConfig.FMOD_CUSTOM_PATH.get();
+            if (customPath == null || customPath.trim().isEmpty()) {
+                return false; // No custom path configured
+            }
+
+            String normalizedPath = customPath.trim();
+            if (!normalizedPath.endsWith("\\") && !normalizedPath.endsWith("/")) {
+                normalizedPath += "\\";
+            }
+
+            loadLibrariesFromPath(normalizedPath);
+            log(GREEN + "Successfully loaded FMOD libraries from custom path: " + normalizedPath + RESET);
+            return true;
+
+        } catch (Exception e) {
+            log(YELLOW + "Custom path loading failed: " + e.getMessage() + RESET);
+            return false;
+        }
+    }
+
+    /**
+     * Try loading from system PATH
+     */
+    private static boolean tryLoadFromSystemPath() {
+        try {
+            System.loadLibrary("fmod");
+            System.loadLibrary("fmodstudio");
+            log(GREEN + "Successfully loaded FMOD libraries from system PATH" + RESET);
+            return true;
+        } catch (UnsatisfiedLinkError e) {
+            log(YELLOW + "System PATH loading failed: " + e.getMessage() + RESET);
+            return false;
+        }
+    }
+
+    /**
+     * Try loading from common installation paths
+     */
+    private static boolean tryLoadFromCommonPaths() {
+        String[] commonPaths = {
+            "C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows\\api\\core\\lib\\x64\\",
+            "C:\\Program Files\\FMOD SoundSystem\\FMOD Studio API Windows\\api\\core\\lib\\x64\\",
+            "C:\\Program Files (x86)\\FMOD\\api\\core\\lib\\x64\\",
+            "C:\\Program Files\\FMOD\\api\\core\\lib\\x64\\",
+            ".\\fmod\\",
+            ".\\libraries\\"
+        };
+
+        for (String path : commonPaths) {
+            try {
+                loadLibrariesFromPath(path);
+                log(GREEN + "Successfully loaded FMOD libraries from: " + path + RESET);
+                return true;
+            } catch (Exception e) {
+                log(YELLOW + "Failed to load from " + path + ": " + e.getMessage() + RESET);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Load FMOD libraries from a specific path (with recursive scanning)
+     */
+    private static void loadLibrariesFromPath(String basePath) throws Exception {
+        // First try direct path (for exact folder specification)
+        if (tryLoadDirectPath(basePath)) {
+            return;
+        }
+
+        // If direct path fails, scan subfolders recursively
+        String[] foundPaths = scanForFMODLibraries(basePath, 4); // Max 4 levels deep
+        if (foundPaths != null) {
+            loadLibrariesFromFoundPaths(foundPaths[0], foundPaths[1]);
+            return;
+        }
+
+        throw new Exception("FMOD DLLs not found in " + basePath + " or its subfolders (searched 4 levels deep)");
+    }
+
+    /**
+     * Try loading from direct path (exact folder)
+     */
+    private static boolean tryLoadDirectPath(String basePath) {
+        try {
+            String fmodPath = basePath + "fmod.dll";
+            String fmodStudioPath = basePath + "fmodstudio.dll";
+
+            java.io.File fmodFile = new java.io.File(fmodPath);
+            java.io.File fmodStudioFile = new java.io.File(fmodStudioPath);
+
+            if (fmodFile.exists() && fmodStudioFile.exists()) {
+                loadLibrariesFromFoundPaths(fmodPath, fmodStudioPath);
+                return true;
+            }
+        } catch (Exception e) {
+            // Continue to subfolder scanning
+        }
+        return false;
+    }
+
+    /**
+     * Recursively scan for FMOD DLLs in subfolders
+     */
+    private static String[] scanForFMODLibraries(String basePath, int maxDepth) {
+        return scanForFMODLibrariesRecursive(new java.io.File(basePath), maxDepth, 0);
+    }
+
+    private static String[] scanForFMODLibrariesRecursive(java.io.File dir, int maxDepth, int currentDepth) {
+        if (currentDepth > maxDepth || !dir.exists() || !dir.isDirectory()) {
+            return null;
+        }
+
+        // Check current directory for both DLLs
+        java.io.File fmodFile = new java.io.File(dir, "fmod.dll");
+        java.io.File fmodStudioFile = new java.io.File(dir, "fmodstudio.dll");
+
+        if (fmodFile.exists() && fmodStudioFile.exists()) {
+            log(GREEN + "Found FMOD DLLs in: " + dir.getAbsolutePath() + RESET);
+            return new String[]{fmodFile.getAbsolutePath(), fmodStudioFile.getAbsolutePath()};
+        }
+
+        // Recursively check subdirectories
+        java.io.File[] subdirs = dir.listFiles(java.io.File::isDirectory);
+        if (subdirs != null) {
+            for (java.io.File subdir : subdirs) {
+                String[] result = scanForFMODLibrariesRecursive(subdir, maxDepth, currentDepth + 1);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Load FMOD libraries from found absolute paths
+     */
+    private static void loadLibrariesFromFoundPaths(String fmodPath, String fmodStudioPath) throws Exception {
+        try {
+            System.load(fmodPath);
+            log("Loaded fmod.dll from: " + fmodPath);
+        } catch (UnsatisfiedLinkError e) {
+            throw new Exception("Failed to load fmod.dll from " + fmodPath + ": " + e.getMessage());
+        }
+
+        try {
+            System.load(fmodStudioPath);
+            log("Loaded fmodstudio.dll from: " + fmodStudioPath);
+        } catch (UnsatisfiedLinkError e) {
+            throw new Exception("Failed to load fmodstudio.dll from " + fmodStudioPath + ": " + e.getMessage());
+        }
     }
 
     private static void loadLibraryFromResource(String resourcePath, String libraryName) throws Exception {
