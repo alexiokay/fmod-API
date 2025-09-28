@@ -35,9 +35,9 @@ public class FMODConfig {
         FMOD_CUSTOM_PATH = BUILDER
             .comment("Custom FMOD installation path (leave empty for auto-detection)",
                      "If you installed FMOD Engine in a non-standard location, specify the path here.",
-                     "Example: C:\\MyCustomPath\\FMOD\\api\\core\\lib\\x64\\",
+                     "Example: C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows",
                      "Required files: fmod.dll and fmodstudio.dll",
-                     "Compatible with FMOD Engine version 2.02.16 or higher",
+                     "Compatible with FMOD Engine version 2.02.16",
                      "Download from: https://www.fmod.com/download#fmodengine")
             .translation("config.fmodapi.custom_path")
             .define("fmodCustomPath", "");

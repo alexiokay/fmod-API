@@ -213,15 +213,15 @@ The mod uses a **3-tier detection system**:
 
 **Custom installs:** Set the root folder in config - recursive scanning finds the DLLs anywhere within 4 folder levels.
 
-**Example:** Set path to `C:\MyFMOD\` and it will find DLLs at:
-`C:\MyFMOD\Studio\API\Windows\api\core\lib\x64\fmod.dll`
+**Example:** Set path to `C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows` and it will find DLLs at:
+`C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\core\lib\x64`
 
 #### Licensing Note
 - FMOD Engine is free for non-commercial use and indie development
 - Commercial projects need commercial licenses from FMOD
 - See https://www.fmod.com/legal for full licensing terms
 - **This mod does NOT redistribute FMOD libraries** - you install them separately
-- **Compatible with FMOD Engine 2.02.16 or higher**
+- **Compatible with FMOD Engine 2.02.16**
 
 #### Fallback Behavior
 If FMOD Engine is not found anywhere, the mod automatically falls back to Minecraft's OpenAL audio system. Mods using FMOD API will still work, but with reduced audio functionality.

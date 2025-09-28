@@ -6,7 +6,14 @@
     "fmodapi.configuration.section.fmodapi.common.toml.title": "Ustawienia FMOD Audio API",
 
     "config.fmodapi.fmod_enabled": "Włącz Audio FMOD",
+    "config.fmodapi.fmod_enabled.tooltip": "Włącz system audio FMOD (zmiany obowiązują natychmiast)",
+
     "config.fmodapi.debug_logging": "Włącz Logowanie Debugowania",
+    "config.fmodapi.debug_logging.tooltip": "Włącz szczegółowe logowanie dla FMOD API - przydatne do rozwiązywania problemów z dźwiękiem",
+
     "config.fmodapi.max_instances": "Maksymalna Liczba Instancji Dźwięku",
-    "config.fmodapi.custom_path": "Niestandardowa Ścieżka FMOD"
+    "config.fmodapi.max_instances.tooltip": "Maksymalna liczba jednoczesnych instancji dźwięku FMOD (32-4096, domyślnie: 512)",
+
+    "config.fmodapi.custom_path": "Niestandardowa Ścieżka FMOD",
+    "config.fmodapi.custom_path.tooltip": "Niestandardowa ścieżka instalacji FMOD (pozostaw puste dla automatycznego wykrywania). Jeśli zainstalowałeś FMOD Engine w niestandardowej lokalizacji, podaj tutaj ścieżkę. Przykład: C:\\Program Files (x86)\\FMOD SoundSystem\\FMOD Studio API Windows. Wymagane pliki: fmod.dll i fmodstudio.dll. Kompatybilne z FMOD Engine w wersji 2.02.16. Pobierz z: https://www.fmod.com/download#fmodengine"
 }
