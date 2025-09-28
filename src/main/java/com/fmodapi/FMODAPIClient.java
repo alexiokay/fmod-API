@@ -25,6 +25,13 @@ public class FMODAPIClient {
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
         // Client setup for FMOD API
+        System.out.println("[FMOD API] Client setup started");
+
+        // Initialize Minecraft integration after client setup
+        event.enqueueWork(() -> {
+            FMODMinecraftIntegration.initialize();
+        });
+
         System.out.println("[FMOD API] Client setup completed");
     }
 }

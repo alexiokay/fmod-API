@@ -34,7 +34,6 @@ public class FMODListenerTracker {
      */
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
-        System.out.println("[FMOD API] PlayerTickEvent.Post fired"); // Debug
 
         // Only process client-side player
         if (!event.getEntity().level().isClientSide()) {
@@ -101,8 +100,8 @@ public class FMODListenerTracker {
                 velX, velY, velZ
             );
 
-            // Debug logging (temporarily always enabled for testing)
-            if (positionChanged) {
+            // Optional debug logging when enabled
+            if (FMODConfig.DEBUG_LOGGING.get() && positionChanged) {
                 System.out.printf("[FMOD API] Auto-listener update - Pos:(%.1f, %.1f, %.1f) Vel:(%.2f, %.2f, %.2f)%n",
                     currentX, currentY, currentZ, velX, velY, velZ);
             }

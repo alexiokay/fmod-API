@@ -1,0 +1,11 @@
+{
+    "_comment": "FMOD API Polish translations - Polskie tłumaczenia FMOD API",
+
+    "fmodapi.configuration.title": "Konfiguracja FMOD Audio API",
+    "fmodapi.configuration.section.fmodapi.common.toml": "Ustawienia Audio FMOD",
+    "fmodapi.configuration.section.fmodapi.common.toml.title": "Ustawienia FMOD Audio API",
+
+    "config.fmodapi.fmod_enabled": "Włącz Audio FMOD",
+    "config.fmodapi.debug_logging": "Włącz Logowanie Debugowania",
+    "config.fmodapi.max_instances": "Maksymalna Liczba Instancji Dźwięku"
+}

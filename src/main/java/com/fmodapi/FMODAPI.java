@@ -71,13 +71,8 @@ public class FMODAPI {
      * @return true if sound was played successfully, false if failed
      */
     public static boolean playEventSimple(String eventName, double x, double y, double z) {
-        System.out.println(">>> FMOD API: playEventSimple called for: " + eventName);
-        System.out.println(">>> FMOD API: playEventSimple called for: " + eventName);
-        System.out.println(">>> FMOD API: playEventSimple called for: " + eventName);
         String instanceId = playEventAt(eventName, x, y, z, 1.0f, 1.0f);
-        boolean result = instanceId != null;
-        System.out.println(">>> FMOD API: playEventSimple returning: " + result);
-        return result;
+        return instanceId != null;
     }
 
     /**
@@ -422,6 +417,81 @@ public class FMODAPI {
                     // Ignore cleanup errors during shutdown
                 }
             }
+        }
+    }
+
+    /**
+     * Pause all currently playing FMOD sounds.
+     * Called when the game is paused (e.g., ESC menu).
+     */
+    public static void pauseAllSounds() {
+        if (!isAvailable()) {
+            return;
+        }
+
+        Map<String, Long> instances = FMODSystem.getActiveInstances();
+        for (Long instance : instances.values()) {
+            try {
+                FMODStudio.FMOD_Studio_EventInstance_SetPaused(instance, 1); // 1 = true in FMOD
+            } catch (Exception e) {
+                // Ignore errors during pause
+            }
+        }
+    }
+
+    /**
+     * Resume all currently paused FMOD sounds.
+     * Called when the game is unpaused.
+     */
+    public static void resumeAllSounds() {
+        if (!isAvailable()) {
+            return;
+        }
+
+        Map<String, Long> instances = FMODSystem.getActiveInstances();
+        for (Long instance : instances.values()) {
+            try {
+                FMODStudio.FMOD_Studio_EventInstance_SetPaused(instance, 0); // 0 = false in FMOD
+            } catch (Exception e) {
+                // Ignore errors during resume
+            }
+        }
+    }
+
+    /**
+     * Set master volume for all FMOD sounds.
+     * @param volume Volume level (0.0 to 1.0)
+     */
+    public static void setMasterVolume(float volume) {
+        if (!isAvailable()) {
+            return;
+        }
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Get the core system for volume control
+            PointerBuffer coreSystemPtr = stack.mallocPointer(1);
+            int result = FMODStudio.FMOD_Studio_System_GetCoreSystem(FMODSystem.getSystemHandle(), coreSystemPtr);
+
+            if (result == FMOD.FMOD_OK) {
+                long coreSystem = coreSystemPtr.get(0);
+
+                // Set master volume on the core system using the master channel group
+                PointerBuffer masterGroupPtr = stack.mallocPointer(1);
+                result = FMOD.FMOD_System_GetMasterChannelGroup(coreSystem, masterGroupPtr);
+
+                if (result == FMOD.FMOD_OK) {
+                    long masterGroup = masterGroupPtr.get(0);
+                    result = FMOD.FMOD_ChannelGroup_SetVolume(masterGroup, Math.max(0.0f, Math.min(1.0f, volume)));
+
+                    if (result != FMOD.FMOD_OK) {
+                        System.err.println("[FMOD API] Failed to set master volume: " + result);
+                    }
+                } else {
+                    System.err.println("[FMOD API] Failed to get master channel group: " + result);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[FMOD API] Exception setting master volume: " + e.getMessage());
         }
     }
 

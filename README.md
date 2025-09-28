@@ -114,6 +114,46 @@ FMODAPI.loadBank("/assets/mts/sounds/fmod/Master.bank"); // Wrong!
 - **Overloaded methods** for different use cases
 - **Builder pattern** for complex configurations
 
+## 📦 Setup & Installation
+
+### FMOD Libraries Setup
+
+**⚠️ IMPORTANT: FMOD DLL files are NOT included due to licensing restrictions.**
+
+You must download and install the FMOD libraries yourself:
+
+#### Step 1: Download FMOD Engine
+- Visit: https://www.fmod.com/download#fmodengine
+- Download **FMOD Engine version 2.02.16** (or compatible version)
+- Create a free FMOD account if required
+
+#### Step 2: Install & Locate Libraries
+1. Run the FMOD Engine installer
+2. Navigate to your installation folder
+3. Find the following files:
+   - `api/core/lib/x64/fmod.dll`
+   - `api/studio/lib/x64/fmodstudio.dll`
+
+#### Step 3: Place Libraries
+Copy both DLL files to: `src/main/resources/libraries/`
+
+#### Expected Structure
+```
+src/main/resources/libraries/
+├── README.md
+├── fmod.dll
+└── fmodstudio.dll
+```
+
+#### Licensing Note
+- FMOD requires separate licensing for redistribution
+- Free for non-commercial use and indie development
+- Commercial projects need commercial licenses
+- See https://www.fmod.com/legal for full terms
+
+#### Fallback Behavior
+If FMOD libraries are missing, the mod automatically falls back to Minecraft's OpenAL audio system with reduced functionality.
+
 ## 🔧 Technical Requirements
 
 ### Performance Requirements

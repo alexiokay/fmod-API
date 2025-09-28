@@ -56,8 +56,8 @@ Thumbs.db
 *.tar.gz
 *.rar
 
-# Exception: Allow FMOD DLL files in resources
-!src/main/resources/libraries/*.dll
+# FMOD DLL files - not included due to licensing restrictions
+src/main/resources/libraries/*.dll
 
 # Local development files
 local.properties

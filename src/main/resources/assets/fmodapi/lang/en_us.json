@@ -1,13 +1,9 @@
 {
-  "itemGroup.fmodapi": "Example Mod Tab",
-  "block.fmodapi.example_block": "Example Block",
-  "item.fmodapi.example_item": "Example Item",
+  "fmodapi.configuration.title": "FMOD Audio API Configuration",
+  "fmodapi.configuration.section.fmodapi.common.toml": "FMOD Audio Settings",
+  "fmodapi.configuration.section.fmodapi.common.toml.title": "FMOD Audio API Settings",
 
-  "fmodapi.configuration.title": "fmod-API Configs",
-  "fmodapi.configuration.section.fmodapi.common.toml": "fmod-API Configs",
-  "fmodapi.configuration.section.fmodapi.common.toml.title": "fmod-API Configs",
-  "fmodapi.configuration.items": "Item List",
-  "fmodapi.configuration.logDirtBlock": "Log Dirt Block",
-  "fmodapi.configuration.magicNumberIntroduction": "Magic Number Text",
-  "fmodapi.configuration.magicNumber": "Magic Number"
+  "config.fmodapi.fmod_enabled": "Enable FMOD Audio",
+  "config.fmodapi.debug_logging": "Enable Debug Logging",
+  "config.fmodapi.max_instances": "Maximum Sound Instances"
 }

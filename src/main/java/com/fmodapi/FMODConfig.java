@@ -13,51 +13,24 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class FMODConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    // Status Information (read-only)
-    public static final ModConfigSpec.ConfigValue<String> FMOD_STATUS;
-    public static final ModConfigSpec.ConfigValue<String> AUDIO_SYSTEM;
-    public static final ModConfigSpec.IntValue FMOD_ERROR_CODE;
-    public static final ModConfigSpec.IntValue ACTIVE_INSTANCES;
-    public static final ModConfigSpec.IntValue MAX_INSTANCES;
-
-    // Control Options
+    // Configuration Options
     public static final ModConfigSpec.BooleanValue FMOD_ENABLED;
     public static final ModConfigSpec.BooleanValue DEBUG_LOGGING;
+    public static final ModConfigSpec.IntValue MAX_INSTANCES;
 
     static {
-        BUILDER.push("Status");
-        FMOD_STATUS = BUILDER
-            .comment("Current FMOD initialization status (read-only)")
-            .translation("config.fmodapi.status.fmod_status")
-            .define("fmodStatus", "Not initialized");
-        AUDIO_SYSTEM = BUILDER
-            .comment("Current active audio system (read-only)")
-            .translation("config.fmodapi.status.audio_system")
-            .define("audioSystem", "Pending");
-        FMOD_ERROR_CODE = BUILDER
-            .comment("Last FMOD error code - 0 = success, 20 = hardware conflict (read-only)")
-            .translation("config.fmodapi.status.error_code")
-            .defineInRange("fmodErrorCode", -1, -1, 999);
-        ACTIVE_INSTANCES = BUILDER
-            .comment("Number of currently active sound instances (read-only)")
-            .translation("config.fmodapi.status.active_instances")
-            .defineInRange("activeInstances", 0, 0, 999);
-        MAX_INSTANCES = BUILDER
-            .comment("Maximum allowed sound instances (read-only)")
-            .translation("config.fmodapi.status.max_instances")
-            .defineInRange("maxInstances", 128, 0, 999);
-        BUILDER.pop();
-
-        BUILDER.push("Settings");
         FMOD_ENABLED = BUILDER
             .comment("Enable FMOD audio system (takes effect immediately)")
-            .translation("config.fmodapi.settings.fmod_enabled")
+            .translation("config.fmodapi.fmod_enabled")
             .define("fmodEnabled", true);
         DEBUG_LOGGING = BUILDER
-            .comment("Enable debug logging for FMOD API")
-            .translation("config.fmodapi.settings.debug_logging")
+            .comment("Enable debug logging for FMOD API - useful for troubleshooting audio issues")
+            .translation("config.fmodapi.debug_logging")
             .define("debugLogging", false);
-        BUILDER.pop();
+        MAX_INSTANCES = BUILDER
+            .comment("Maximum number of concurrent FMOD sound instances (32-4096, default: 512)")
+            .translation("config.fmodapi.max_instances")
+            .defineInRange("maxInstances", 512, 32, 4096);
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();
@@ -66,9 +39,6 @@ public class FMODConfig {
     static void onLoad(final ModConfigEvent event) {
         // When config loads, check if FMOD should be initialized
         FMODSystem.checkConfigAndInit();
-
-        // Update status when config loads
-        updateStatus();
     }
 
     @SubscribeEvent
@@ -79,10 +49,6 @@ public class FMODConfig {
         System.out.println("[FMOD API Config] ModConfigEvent.Reloading fired - handling runtime config change");
         // When config is changed in-game, handle FMOD enable/disable
         handleRuntimeConfigChange();
-        updateStatus();
-
-        // Force config screen refresh by updating all status values
-        forceConfigScreenRefresh();
     }
 
     /**
@@ -117,43 +83,6 @@ public class FMODConfig {
     }
 
     /**
-     * Force config screen refresh by triggering value change notifications
-     */
-    private static void forceConfigScreenRefresh() {
-        try {
-            // Force all status values to update by setting them again
-            // This triggers the config screen to refresh
-            var status = FMODAPI.getStatus();
-            FMOD_STATUS.set(status.status);
-            AUDIO_SYSTEM.set(status.audioSystem);
-            FMOD_ERROR_CODE.set(status.errorCode);
-            ACTIVE_INSTANCES.set(FMODAPI.getActiveInstanceCount());
-            MAX_INSTANCES.set(FMODAPI.getMaxInstanceCount());
-
-            System.out.println("[FMOD API Config] Forced config screen refresh - status updated");
-        } catch (Exception e) {
-            System.err.println("[FMOD API Config] Failed to force config refresh: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Updates the config status values from current FMOD system state.
-     */
-    public static void updateStatus() {
-        try {
-            FMODAPI.FMODStatus status = FMODAPI.getStatus();
-            FMOD_STATUS.set(status.status);
-            AUDIO_SYSTEM.set(status.audioSystem);
-            FMOD_ERROR_CODE.set(status.errorCode);
-            ACTIVE_INSTANCES.set(FMODAPI.getActiveInstanceCount());
-            MAX_INSTANCES.set(FMODAPI.getMaxInstanceCount());
-        } catch (Exception e) {
-            // Config not ready yet during initialization
-            System.out.println("[FMOD API Config] Status update skipped during initialization");
-        }
-    }
-
-    /**
      * Reinitialize FMOD system (useful for troubleshooting).
      */
     public static void reinitializeFMOD() {
@@ -161,7 +90,6 @@ public class FMODConfig {
             FMODSystem.shutdown();
             Thread.sleep(500); // Small delay
             FMODSystem.init();
-            updateStatus();
             System.out.println("[FMOD API Config] FMOD system reinitialized");
         } catch (Exception e) {
             System.err.println("[FMOD API Config] Failed to reinitialize FMOD: " + e.getMessage());

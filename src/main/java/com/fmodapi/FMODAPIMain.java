@@ -8,6 +8,9 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 /**
  * Main FMOD API mod class.
@@ -48,6 +51,7 @@ public class FMODAPIMain {
 
         System.out.println("[FMOD API] Constructor completed - FMOD init will happen in commonSetup");
     }
+
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         System.out.println("[FMOD API] Common setup called");

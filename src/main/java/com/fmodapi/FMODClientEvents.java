@@ -12,8 +12,6 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 @EventBusSubscriber(modid = "fmodapi", bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class FMODClientEvents {
 
-    private static int tickCounter = 0;
-
     /**
      * Update FMOD system every client tick
      */
@@ -21,13 +19,6 @@ public class FMODClientEvents {
     public static void onClientTick(ClientTickEvent.Post event) {
         try {
             FMODSystem.update();
-
-            // Update config status periodically (every 60 ticks = 3 seconds)
-            tickCounter++;
-            if (tickCounter >= 60) {
-                FMODConfig.updateStatus();
-                tickCounter = 0;
-            }
         } catch (Exception e) {
             System.err.println("[FMOD API] Exception during client tick update: " + e.getMessage());
         }
