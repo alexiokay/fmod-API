@@ -159,6 +159,17 @@ publishing {
     }
 }
 
+// Read environment variables from .env file
+def envFile = file('.env')
+def includeLibs = false
+if (envFile.exists()) {
+    envFile.readLines().each { line ->
+        if (line.startsWith('INCLUDE_LIBS=')) {
+            includeLibs = line.split('=')[1].trim().toBoolean()
+        }
+    }
+}
+
 // Include FMOD classes in the JAR
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -173,6 +184,15 @@ jar {
     // Global exclusions
     exclude '**/module-info.class'
     exclude 'META-INF/versions/*/module-info.class'
+
+    // Conditionally exclude FMOD DLL files based on .env setting
+    if (!includeLibs) {
+        exclude 'libraries/*.dll'
+        exclude 'libraries/**/*.dll'
+        println 'FMOD DLL files excluded from JAR (INCLUDE_LIBS=false)'
+    } else {
+        println 'FMOD DLL files included in JAR (INCLUDE_LIBS=true)'
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
