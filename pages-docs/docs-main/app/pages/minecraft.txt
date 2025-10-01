@@ -1,0 +1,311 @@
+<template>
+  <div class="minecraft-landing">
+    <!-- Hero Section - Minecraft World -->
+    <section class="relative h-screen bg-gradient-to-b from-cyan-400 via-blue-500 to-green-400 overflow-hidden">
+      <!-- Sky with clouds -->
+      <div class="absolute inset-0">
+        <div class="absolute top-20 left-20 w-32 h-16 bg-white/80 rounded-full blur-sm animate-pulse"></div>
+        <div class="absolute top-32 right-32 w-24 h-12 bg-white/60 rounded-full blur-sm"></div>
+        <div class="absolute top-16 right-1/4 w-20 h-10 bg-white/70 rounded-full blur-sm animate-pulse"></div>
+      </div>
+
+      <!-- Minecraft blocks floating -->
+      <div class="absolute inset-0">
+        <div class="absolute top-1/4 left-1/4 w-16 h-16 bg-green-600 animate-bounce" style="animation-delay: 0s; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%)"></div>
+        <div class="absolute top-1/3 right-1/3 w-12 h-12 bg-stone-700 animate-bounce" style="animation-delay: 1s; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%)"></div>
+        <div class="absolute bottom-1/3 left-1/3 w-14 h-14 bg-amber-500 animate-bounce" style="animation-delay: 2s; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%)"></div>
+      </div>
+
+      <div class="relative z-10 flex items-center justify-center h-full text-center px-6">
+        <div class="max-w-4xl">
+          <!-- Minecraft-style pixelated title -->
+          <h1 class="text-6xl md:text-8xl font-bold text-white mb-6 tracking-wider pixelated-text"
+              style="font-family: 'Minecraft', 'Courier New', monospace;
+                     text-shadow: 4px 4px 0px rgba(0,0,0,0.8), 8px 8px 0px rgba(0,0,0,0.4);">
+            FMOD
+            <br>
+            <span class="text-emerald-300">SOUNDS</span>
+          </h1>
+
+          <p class="text-xl md:text-2xl text-white/90 mb-12 font-medium max-w-2xl mx-auto"
+             style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+            Bring your Minecraft world to life with professional 3D audio that responds to every block, every mob, every adventure.
+          </p>
+
+          <!-- Minecraft-style buttons -->
+          <div class="flex flex-col sm:flex-row gap-6 justify-center">
+            <UButton
+              size="xl"
+              class="minecraft-button bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-12 py-6 text-lg transform hover:translate-y-[-4px] transition-all duration-150 shadow-[0_8px_0_0] shadow-emerald-800 hover:shadow-[0_12px_0_0] hover:shadow-emerald-800"
+              style="font-family: 'Minecraft', 'Courier New', monospace; border: 4px solid #065f46; clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);"
+            >
+              🎮 START CRAFTING AUDIO
+            </UButton>
+
+            <UButton
+              size="xl"
+              class="minecraft-button bg-stone-600 hover:bg-stone-500 text-white font-bold px-12 py-6 text-lg transform hover:translate-y-[-4px] transition-all duration-150 shadow-[0_8px_0_0] shadow-stone-900 hover:shadow-[0_12px_0_0] hover:shadow-stone-900"
+              style="font-family: 'Minecraft', 'Courier New', monospace; border: 4px solid #1c1917; clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);"
+            >
+              📖 LEARN THE BLOCKS
+            </UButton>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ground/grass blocks -->
+      <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-green-600 to-green-500">
+        <div class="h-4 bg-amber-800"></div>
+        <div class="flex">
+          <div class="w-16 h-16 bg-green-600 border-2 border-green-700"></div>
+          <div class="w-16 h-16 bg-green-500 border-2 border-green-600"></div>
+          <div class="w-16 h-16 bg-green-600 border-2 border-green-700"></div>
+          <div class="w-16 h-16 bg-green-500 border-2 border-green-600"></div>
+          <div class="w-16 h-16 bg-green-600 border-2 border-green-700"></div>
+          <div class="flex-1 bg-green-500"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Biome Features Section -->
+    <section class="py-24 px-6 bg-gradient-to-r from-green-900 to-emerald-800">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-white mb-6 pixelated-text"
+              style="font-family: 'Minecraft', 'Courier New', monospace; text-shadow: 3px 3px 0px rgba(0,0,0,0.5);">
+            🌍 EXPLORE EVERY BIOME
+          </h2>
+          <p class="text-xl text-emerald-100 max-w-3xl mx-auto">
+            From the depths of caves to the heights of mountains, every environment has its unique soundscape
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Forest Biome -->
+          <div class="minecraft-biome-card bg-gradient-to-b from-green-700 to-green-800 p-8 transform hover:scale-105 transition-all duration-300">
+            <div class="text-6xl mb-4 text-center">🌲</div>
+            <h3 class="text-2xl font-bold text-white mb-4 text-center pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+              FOREST SOUNDS
+            </h3>
+            <p class="text-green-100 text-center">
+              Rustling leaves, flowing streams, and distant wolf howls create an immersive forest experience
+            </p>
+          </div>
+
+          <!-- Cave Biome -->
+          <div class="minecraft-biome-card bg-gradient-to-b from-gray-800 to-stone-900 p-8 transform hover:scale-105 transition-all duration-300">
+            <div class="text-6xl mb-4 text-center">⛏️</div>
+            <h3 class="text-2xl font-bold text-white mb-4 text-center pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+              CAVE ECHOES
+            </h3>
+            <p class="text-stone-100 text-center">
+              Every pickaxe strike echoes through caverns, with dripping stalactites and distant mob sounds
+            </p>
+          </div>
+
+          <!-- Ocean Biome -->
+          <div class="minecraft-biome-card bg-gradient-to-b from-blue-700 to-blue-800 p-8 transform hover:scale-105 transition-all duration-300">
+            <div class="text-6xl mb-4 text-center">🌊</div>
+            <h3 class="text-2xl font-bold text-white mb-4 text-center pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+              OCEAN DEPTHS
+            </h3>
+            <p class="text-blue-100 text-center">
+              Underwater ambience with dolphin calls, flowing currents, and the mystery of the deep
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block-by-Block Features -->
+    <section class="py-24 px-6 bg-stone-900">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-white mb-6 pixelated-text"
+              style="font-family: 'Minecraft', 'Courier New', monospace; text-shadow: 3px 3px 0px rgba(0,0,0,0.5);">
+            🧱 BUILT BLOCK BY BLOCK
+          </h2>
+          <p class="text-xl text-stone-300 max-w-3xl mx-auto">
+            Every sound is crafted with the same attention to detail as your builds
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <!-- 3D Minecraft Crafting Table -->
+          <ClientOnly>
+            <LazyMinecraftCraftingTable />
+            <template #fallback>
+              <div class="w-full h-96 bg-gradient-to-b from-amber-900 to-amber-800 rounded-lg flex items-center justify-center">
+                <div class="text-center text-amber-200">
+                  <div class="text-4xl mb-4 animate-pulse">🔨</div>
+                  <div class="text-lg pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+                    Preparing 3D Crafting Table...
+                  </div>
+                </div>
+              </div>
+            </template>
+          </ClientOnly>
+
+
+
+
+          <!-- Features List -->
+          <div class="space-y-6">
+            <div class="minecraft-feature-item flex items-start gap-4 p-4 bg-stone-800 hover:bg-stone-700 transition-colors">
+              <div class="text-3xl">🎯</div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2 pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+                  PRECISION PLACEMENT
+                </h3>
+                <p class="text-stone-300">
+                  3D positional audio that knows exactly where every sound should be - just like placing blocks
+                </p>
+              </div>
+            </div>
+
+
+            
+
+            <div class="minecraft-feature-item flex items-start gap-4 p-4 bg-stone-800 hover:bg-stone-700 transition-colors">
+              <div class="text-3xl">⚡</div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2 pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+                  REDSTONE FAST
+                </h3>
+                <p class="text-stone-300">
+                  Lightning-fast performance that won't slow down your world, no matter how complex your builds
+                </p>
+              </div>
+            </div>
+
+            <div class="minecraft-feature-item flex items-start gap-4 p-4 bg-stone-800 hover:bg-stone-700 transition-colors">
+              <div class="text-3xl">🔧</div>
+              <div>
+                <h3 class="text-xl font-bold text-white mb-2 pixelated-text" style="font-family: 'Minecraft', 'Courier New', monospace;">
+                  MODDER FRIENDLY
+                </h3>
+                <p class="text-stone-300">
+                  Simple API that works with any mod - no complex wiring required, just plug and play
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <MinecraftBlockBuilder></MinecraftBlockBuilder>
+
+    <!-- Final CTA - Clean Minecraft Style -->
+    <section class="py-32 px-6 bg-gradient-to-b from-emerald-600 to-emerald-700 relative overflow-hidden">
+      <!-- Clean geometric pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute inset-0" style="
+          background-image:
+            linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.1) 60%, transparent 60%),
+            linear-gradient(-45deg, transparent 40%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.1) 60%, transparent 60%);
+          background-size: 60px 60px;
+        "></div>
+      </div>
+
+      <div class="relative max-w-5xl mx-auto text-center">
+        <div class="text-7xl mb-8">🎮</div>
+        <h2 class="text-4xl md:text-6xl font-bold text-white mb-6 pixelated-text"
+            style="font-family: 'Minecraft', 'Courier New', monospace; text-shadow: 3px 3px 0px rgba(0,0,0,0.4);">
+          START YOUR AUDIO ADVENTURE
+        </h2>
+        <p class="text-xl text-emerald-100 mb-12 max-w-3xl mx-auto font-medium">
+          Download FMOD API and transform your Minecraft world with professional 3D audio
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+          <UButton
+            to="/docs/getting-started"
+            size="xl"
+            class="minecraft-button bg-white hover:bg-gray-100 text-emerald-700 font-bold px-12 py-6 text-lg transform hover:translate-y-[-4px] transition-all duration-150 shadow-[0_8px_0_0] shadow-white/20 hover:shadow-[0_12px_0_0] hover:shadow-white/20"
+            style="font-family: 'Minecraft', 'Courier New', monospace; border: 3px solid rgba(255,255,255,0.3);"
+          >
+            🚀 GET STARTED
+          </UButton>
+
+          <UButton
+            to="https://modrinth.com/mod/fmod-api"
+            target="_blank"
+            size="xl"
+            class="minecraft-button bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-12 py-6 text-lg transform hover:translate-y-[-4px] transition-all duration-150 shadow-[0_8px_0_0] shadow-emerald-900/50 hover:shadow-[0_12px_0_0] hover:shadow-emerald-900/50"
+            style="font-family: 'Minecraft', 'Courier New', monospace; border: 3px solid rgba(0,0,0,0.2);"
+          >
+            📦 DOWNLOAD MOD
+          </UButton>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+// Configure SEO for minecraft page
+useSeoMeta({
+  title: 'FMOD Sounds for Minecraft - Professional Audio Blocks',
+  description: 'Transform your Minecraft world with professional 3D audio. Every biome, every block, every adventure sounds incredible with FMOD API.',
+  ogTitle: 'FMOD Sounds for Minecraft - Professional Audio Blocks',
+  ogDescription: 'Transform your Minecraft world with professional 3D audio. Every biome, every block, every adventure sounds incredible with FMOD API.',
+  ogType: 'website',
+  twitterCard: 'summary_large_image'
+})
+
+definePageMeta({
+  layout: 'default'
+})
+</script>
+
+<style scoped>
+.pixelated-text {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.minecraft-button {
+  image-rendering: pixelated;
+  position: relative;
+}
+
+.minecraft-biome-card {
+  border: 4px solid rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.minecraft-biome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+}
+
+.minecraft-crafting-table {
+  position: relative;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 2px, transparent 2px, transparent 16px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 2px, transparent 2px, transparent 16px);
+}
+
+.minecraft-feature-item {
+  border-left: 4px solid #10b981;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+</style>

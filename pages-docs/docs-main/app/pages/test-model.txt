@@ -1,0 +1,140 @@
+<template>
+  <div class="min-h-screen bg-gray-900">
+    <div class="container mx-auto p-8">
+      <h1 class="text-3xl font-bold text-white mb-4">GLTF Model Test</h1>
+
+      <div class="w-full h-96 bg-black rounded-lg overflow-hidden">
+        <ClientOnly>
+          <TresCanvas
+            v-bind="gl"
+            class="w-full h-full"
+          >
+            <!-- Camera -->
+            <TresPerspectiveCamera :position="[50, 50, 50]" :look-at="[0, 0, 0]" />
+
+            <!-- Lighting -->
+            <TresAmbientLight :intensity="1.5" />
+            <TresDirectionalLight
+              :position="[10, 10, 10]"
+              :intensity="2.0"
+            />
+            <TresPointLight
+              :position="[0, 10, 0]"
+              :intensity="2.0"
+              :color="0xffffff"
+            />
+
+            <!-- Test Model -->
+            <TresGroup :position="[0, 0, 0]" :scale="[20, 20, 20]">
+              <primitive
+                v-if="modelScene"
+                :object="modelScene"
+              />
+            </TresGroup>
+
+            <!-- Reference cube for scale -->
+            <TresMesh :position="[5, 0, 0]">
+              <TresBoxGeometry :args="[2, 2, 2]" />
+              <TresMeshLambertMaterial :color="0xff0000" />
+            </TresMesh>
+          </TresCanvas>
+        </ClientOnly>
+      </div>
+
+      <div class="mt-4 text-white">
+        <p v-if="isLoading">Loading model...</p>
+        <p v-if="error" class="text-red-400">Error: {{ error }}</p>
+        <p v-if="modelScene" class="text-green-400">Model loaded successfully!</p>
+
+        <div class="mt-4 text-sm">
+          <p>Debug Info:</p>
+          <p>Loading: {{ isLoading }}</p>
+          <p>Has Model: {{ !!modelScene }}</p>
+          <p>Error: {{ error || 'None' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, watchEffect } from 'vue'
+import { useLoader } from '@tresjs/core'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import * as THREE from 'three'
+
+// Setup DRACO loader
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/')
+
+console.log('Test page: Attempting to load model from: /models/3d_crafting_table.glb')
+
+// Load the model
+const { state: model, isLoading, error } = useLoader(
+  GLTFLoader,
+  '/models/3d_crafting_table.glb',
+  {
+    extensions: (loader) => {
+      if (loader instanceof GLTFLoader) {
+        loader.setDRACOLoader(dracoLoader)
+      }
+    },
+  },
+)
+
+// Extract the scene
+const modelScene = computed(() => model.value?.scene)
+
+// Debug the model when it loads
+watchEffect(() => {
+  if (modelScene.value) {
+    console.log('TEST PAGE: Model loaded successfully:', modelScene.value)
+
+    // Get bounding box
+    const box = new THREE.Box3().setFromObject(modelScene.value)
+    const size = box.getSize(new THREE.Vector3())
+    const center = box.getCenter(new THREE.Vector3())
+    console.log('TEST PAGE: Model bounding box size:', size)
+    console.log('TEST PAGE: Model bounding box center:', center)
+
+    // Center the model at origin
+    modelScene.value.position.sub(center)
+
+    // Debug all meshes
+    modelScene.value.traverse((child) => {
+      console.log('TEST PAGE: Child:', child.type, child.name, child)
+
+      if (child.isMesh) {
+        console.log('TEST PAGE: Found mesh:', child.name, 'Material:', child.material)
+
+        // Make everything super visible
+        child.castShadow = true
+        child.receiveShadow = true
+        child.visible = true
+
+        if (child.material) {
+          // Don't override the original material, just ensure visibility
+          child.material.wireframe = false
+          child.material.needsUpdate = true
+          child.material.transparent = false
+          child.material.opacity = 1.0
+
+          // Log material info
+          console.log('TEST PAGE: Material for', child.name, ':', {
+            color: child.material.color,
+            map: child.material.map,
+            hasTexture: !!child.material.map
+          })
+        }
+      }
+    })
+  }
+})
+
+// Tres.js config
+const gl = {
+  clearColor: 0x333333,
+  antialias: true
+}
+</script>

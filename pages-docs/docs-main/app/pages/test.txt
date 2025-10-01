@@ -1,0 +1,86 @@
+```vue
+<!-- File: pages/index.vue -->
+<template>
+  <div class="min-h-screen bg-themeBackground text-white font-minecraft flex flex-col">
+    <!-- Hero Section -->
+    <section class="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-green-700 to-green-900">
+      <h1 class="text-5xl mb-4">FMOD API for Minecraft NeoForge</h1>
+      <p class="text-xl mb-6 max-w-2xl">
+        A centralized FMOD Audio Engine API for Minecraft mods — conflict-free, efficient, and powerful.
+      </p>
+      <div class="flex gap-4">
+        <NuxtLink
+          href="#mission"
+          class="px-6 py-3 bg-yellow-400 text-black rounded-lg shadow-lg hover:bg-yellow-300 transition"
+        >
+          Learn More
+        </NuxtLink>
+        <NuxtLink
+          href="https://github.com/alexiokay/fmod-API"
+          target="_blank"
+          class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-400 transition"
+        >
+          View on GitHub
+        </NuxtLink>
+      </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section id="mission" class="py-16 px-6 bg-green-800 text-center">
+      <h2 class="text-3xl mb-6">🎯 Mission Statement</h2>
+      <p class="max-w-3xl mx-auto text-lg">
+        The FMOD API mod provides a centralized, conflict-free FMOD Audio Engine integration 
+        for Minecraft NeoForge mods, enabling multiple mods to use advanced 3D spatial audio 
+        without library conflicts or resource competition.
+      </p>
+    </section>
+
+    <!-- Goals Section -->
+    <section class="py-16 px-6 bg-themeBackground text-center">
+      <h2 class="text-3xl mb-10">🎮 Goals</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto text-left">
+        <!-- Primary Goals -->
+        <div class="p-6 bg-green-900 rounded-lg shadow-md">
+          <h3 class="text-2xl font-bold mb-4">Primary Goals</h3>
+          <ul class="list-disc list-inside space-y-2">
+            <li>Eliminate FMOD conflicts between multiple mods</li>
+            <li>Provide simple, clean API for integration</li>
+            <li>Maintain OpenAL fallback compatibility</li>
+            <li>Centralized resource efficiency</li>
+            <li>Enable advanced 3D spatial audio</li>
+          </ul>
+        </div>
+
+        <!-- Secondary Goals -->
+        <div class="p-6 bg-green-900 rounded-lg shadow-md">
+          <h3 class="text-2xl font-bold mb-4">Secondary Goals</h3>
+          <ul class="list-disc list-inside space-y-2">
+            <li>Reduce mod file sizes with shared FMOD libs</li>
+            <li>Improve audio performance</li>
+            <li>Provide audio debugging tools</li>
+            <li>Support custom sound banks from any mod</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-6 bg-green-900 text-center text-gray-300">
+      <p>© 2025 FMOD API for Minecraft NeoForge. All rights reserved.</p>
+    </footer>
+  </div>
+</template>
+
+<script setup>
+// No logic needed yet, but Nuxt ready for interactivity
+</script>
+
+<style>
+@import url('https://fonts.cdnfonts.com/css/minecraft-4');
+
+.font-minecraft {
+  font-family: 'Minecraft', sans-serif;
+}
+</style>
+```
